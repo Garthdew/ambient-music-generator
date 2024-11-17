@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function createCircle() {
-        const size = Math.random() * 25 + 10; // Reduced size (10 to 35)
+        const size = Math.random() * 12.5 + 5; // Reduced size (random between 5 and 17.5)
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
         const opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
             y,
             size,
             opacity,
-            growth: Math.random() * 2 + 1, // Growth speed
+            growth: Math.random() * 1 + 0.5, // Reduced growth speed (between 0.5 and 1.5 per frame)
             alpha: 1, // Start fully visible
             fadeSpeed: 1 / (60 * 8) // Fade out over 8 seconds
         };
