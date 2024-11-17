@@ -86,9 +86,9 @@ document.addEventListener('DOMContentLoaded', function () {
             y,
             size,
             opacity,
-            growth: Math.random() * 2 + 1, // Growth speed
+            growth: Math.random() * 2 + 1, // Growth speed (adjust for visual appeal)
             alpha: 1, // Start fully visible
-            fadeSpeed: 0.01 // Fade out speed
+            fadeSpeed: 1 / (60 * 8) // Fade out over 8 seconds
         };
         circles.push(circle);
     }
