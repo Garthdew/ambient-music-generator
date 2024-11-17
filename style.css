@@ -34,15 +34,24 @@ body, html {
 
 /* Button Styling */
 button {
-    background: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
     border: none;
-    padding: 15px 30px;
-    font-size: 18px;
-    border-radius: 5px;
+    color: black;
+    padding: 20px;
+    border-radius: 50%; /* Makes it circular */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 18px;
+    width: 120px; /* Fixed width for the circle */
+    height: 120px; /* Fixed height for the circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Hover effects */
+    margin: 0 auto; /* Centers button within the container */
 }
 
 button:hover {
-    background-color: #ddd;
+    transform: scale(1.1); /* Grow slightly on hover */
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly lighter on hover */
 }
