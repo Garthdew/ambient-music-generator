@@ -31,18 +31,37 @@ canvas {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    background: rgba(255, 255, 255, 1); /* Fully opaque */
     color: black;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: normal;
     padding: 10px 20px;
-    border: 5px solid white; /* White stroke */
+    border: 3px solid white; /* White stroke */
     border-radius: 50px; /* Pill shape */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .pill-button:hover {
-    background: rgba(255, 255, 255, 1); /* Fully opaque on hover */
+    background: rgba(240, 240, 240, 1); /* Slightly lighter on hover */
     transform: scale(1.1); /* Slight scaling */
+}
+
+/* Text Styling */
+.info-text {
+    position: absolute;
+    top: 20px;
+    left: 150px; /* Positioned to the right of the button */
+    color: white;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.info-text a {
+    color: white;
+    text-decoration: underline;
+}
+
+.info-text a:hover {
+    color: #dddddd; /* Slight color change on hover */
 }
