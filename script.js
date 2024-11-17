@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function playFirstNote() {
+        if (audioBuffers.length === 0) await loadAudioFiles();
+        playBuffer(audioBuffers[0]); // Immediately play the first note
+        playRandomChord(); // Start the loop
+    }
+
     function playBuffer(buffer) {
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
@@ -51,9 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function startMusic() {
         if (!playing) {
-            if (audioBuffers.length === 0) loadAudioFiles();
             playing = true;
-            playRandomChord();
+            playFirstNote(); // Play the first note immediately
             animateVisualizer();
         }
     }
@@ -65,19 +70,19 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('playButton').addEventListener('click', function () {
         if (playing) {
             stopMusic();
-            this.textContent = 'Generate';
+            this.textContent = 'Generate'; // Change to "Generate" when stopped
         } else {
             if (audioContext.state === 'suspended') {
                 audioContext.resume().then(startMusic);
             } else {
                 startMusic();
             }
-            this.textContent = 'Stop';
+            this.textContent = 'Stop'; // Change to "Stop" when playing
         }
     });
 
     function createCircle() {
-        const size = Math.random() * 50 + 20; // Random size between 20 and 70
+        const size = Math.random() * 25 + 10; // Reduced size (10 to 35)
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
         const opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
             y,
             size,
             opacity,
-            growth: Math.random() * 2 + 1, // Growth speed (adjust for visual appeal)
+            growth: Math.random() * 2 + 1, // Growth speed
             alpha: 1, // Start fully visible
             fadeSpeed: 1 / (60 * 8) // Fade out over 8 seconds
         };
