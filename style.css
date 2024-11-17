@@ -1,3 +1,4 @@
+/* General Styling for Body and HTML */
 body, html {
     margin: 0;
     padding: 0;
@@ -12,17 +13,26 @@ body, html {
     animation: backgroundAnimation 8s ease infinite;
 }
 
+/* Background Animation */
 @keyframes backgroundAnimation {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
+/* Music Generator Styling */
 .music-generator {
     text-align: center;
     color: white;
+    background: transparent; /* Blends with the background */
+    position: absolute; /* Removes it from normal flow */
+    top: 50%; /* Centers vertically */
+    left: 50%; /* Centers horizontally */
+    transform: translate(-50%, -50%); /* Adjust centering */
+    z-index: 10; /* Ensures it sits above the animated background */
 }
 
+/* Button Styling */
 button {
     background: rgba(255, 255, 255, 0.8);
     border: none;
