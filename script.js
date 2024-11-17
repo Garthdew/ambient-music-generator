@@ -1,8 +1,11 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
     const compressor = audioContext.createDynamicsCompressor();
     compressor.connect(audioContext.destination);
+    analyser.connect(compressor);
 
     const chords = [
         'audio/chord1.mp3',
@@ -17,6 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let audioBuffers = [];
     let playing = false;
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     async function loadAudioFiles() {
         const fetchPromises = chords.map(url => fetch(url).then(res => res.arrayBuffer()));
@@ -30,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function playBuffer(buffer) {
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
-        source.connect(compressor);
+        source.connect(analyser);
         source.start();
     }
 
@@ -42,11 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(playRandomChord, randomInterval);
     }
 
-    async function startMusic() {
+    function startMusic() {
         if (!playing) {
-            if (audioBuffers.length === 0) await loadAudioFiles();
+            if (audioBuffers.length === 0) loadAudioFiles();
             playing = true;
             playRandomChord();
+            animateVisualizer();
         }
     }
 
@@ -66,5 +74,36 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             this.textContent = 'Stop';
         }
+    });
+
+    function drawCircle(x, y, radius, alpha) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.fill();
+    }
+
+    function animateVisualizer() {
+        if (!playing) return;
+        analyser.getByteFrequencyData(dataArray);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < dataArray.length; i++) {
+            const value = dataArray[i];
+            const radius = (value / 255) * 50; // Scale radius by audio intensity
+            const alpha = value / 255; // Scale transparency by intensity
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+
+            drawCircle(x, y, radius, alpha);
+        }
+
+        requestAnimationFrame(animateVisualizer);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     });
 });
