@@ -31,19 +31,19 @@ canvas {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: #00FFFFFF
-    color: black;
+    background: white; /* Solid white background */
+    color: black; /* Black text */
     font-size: 16px;
-    font-weight: normal;
+    font-weight: normal; /* Normal weight text */
     padding: 10px 20px;
-    border: 3px solid white; /* White stroke */
+    border: none; /* Removed stroke */
     border-radius: 50px; /* Pill shape */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .pill-button:hover {
-    background: rgba(240, 240, 240, 1); /* Slightly lighter on hover */
+    background: #f0f0f0; /* Slightly darker white on hover */
     transform: scale(1.1); /* Slight scaling */
 }
 
