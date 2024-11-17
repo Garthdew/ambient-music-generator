@@ -34,7 +34,7 @@ canvas {
     background: rgba(255, 255, 255, 1); /* Fully opaque */
     color: black;
     font-size: 16px;
-    font-weight: normal;
+    font-weight: bold;
     padding: 10px 20px;
     border: 3px solid white; /* White stroke */
     border-radius: 50px; /* Pill shape */
@@ -47,21 +47,22 @@ canvas {
     transform: scale(1.1); /* Slight scaling */
 }
 
-/* Text Styling */
-.info-text {
+/* Footer Text Styling */
+.footer-text {
     position: absolute;
-    top: 20px;
-    left: 150px; /* Positioned to the right of the button */
-    color: white;
+    bottom: 20px; /* Push it to the bottom of the screen */
+    width: 100%; /* Full width for centering */
+    text-align: center; /* Center the text horizontally */
+    color: white; /* Make the text white */
     font-size: 14px;
     font-family: Arial, sans-serif;
 }
 
-.info-text a {
+.footer-text a {
     color: white;
     text-decoration: underline;
 }
 
-.info-text a:hover {
-    color: #dddddd; /* Slight color change on hover */
+.footer-text a:hover {
+    color: #dddddd; /* Slightly lighter on hover */
 }
