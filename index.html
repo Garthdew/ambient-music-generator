@@ -1,1 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient Music Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="music-generator">
+        <h1>Ambient Music Generator</h1>
+        <p>Click "Generate" to create a unique, never-ending soundscape.</p>
+        <button id="playButton">Generate</button>
+    </div>
 
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Registered'))
+                .catch(error => console.error('Service Worker Registration Failed:', error));
+        }
+    </script>
+</body>
+</html>
