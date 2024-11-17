@@ -1,11 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
     const compressor = audioContext.createDynamicsCompressor();
     compressor.connect(audioContext.destination);
-    analyser.connect(compressor);
 
     const chords = [
         'audio/chord1.mp3',
@@ -20,10 +16,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let audioBuffers = [];
     let playing = false;
+
     const canvas = document.getElementById('visualizer');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    const circles = []; // Store active circles
 
     async function loadAudioFiles() {
         const fetchPromises = chords.map(url => fetch(url).then(res => res.arrayBuffer()));
@@ -37,15 +36,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function playBuffer(buffer) {
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
-        source.connect(analyser);
+        source.connect(compressor);
         source.start();
+        createCircle(); // Trigger a new circle with each chord
     }
 
     function playRandomChord() {
         if (!playing) return;
         const randomIndex = Math.floor(Math.random() * audioBuffers.length);
         playBuffer(audioBuffers[randomIndex]);
-        const randomInterval = Math.random() * (5000 - 1000) + 1000;
+        const randomInterval = Math.random() * (5000 - 1000) + 1000; // Random time between chords
         setTimeout(playRandomChord, randomInterval);
     }
 
@@ -76,32 +76,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function drawCircle(x, y, radius, alpha) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.fill();
+    function createCircle() {
+        const size = Math.random() * 50 + 20; // Random size between 20 and 70
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
+        const circle = {
+            x,
+            y,
+            size,
+            opacity,
+            growth: Math.random() * 2 + 1, // Growth speed
+            alpha: 1, // Start fully visible
+            fadeSpeed: 0.01 // Fade out speed
+        };
+        circles.push(circle);
     }
 
     function animateVisualizer() {
         if (!playing) return;
-        analyser.getByteFrequencyData(dataArray);
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < dataArray.length; i++) {
-            const value = dataArray[i];
-            const radius = (value / 255) * 50; // Scale radius by audio intensity
-            const alpha = value / 255; // Scale transparency by intensity
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
+        // Draw and update each circle
+        for (let i = circles.length - 1; i >= 0; i--) {
+            const circle = circles[i];
 
-            drawCircle(x, y, radius, alpha);
+            // Draw the circle
+            ctx.beginPath();
+            ctx.arc(circle.x, circle.y, circle.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${circle.alpha * circle.opacity})`;
+            ctx.fill();
+
+            // Update circle properties
+            circle.size += circle.growth; // Grow the circle
+            circle.alpha -= circle.fadeSpeed; // Fade out
+
+            // Remove the circle if it is completely faded
+            if (circle.alpha <= 0) {
+                circles.splice(i, 1);
+            }
         }
 
         requestAnimationFrame(animateVisualizer);
     }
 
+    // Handle window resize
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
