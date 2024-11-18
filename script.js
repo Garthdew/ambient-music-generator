@@ -3,6 +3,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const compressor = audioContext.createDynamicsCompressor();
     compressor.connect(audioContext.destination);
 
+    // Reverb setup
+    const convolver = audioContext.createConvolver();
+    convolver.connect(compressor);
+
+    // Delay setup
+    const delay = audioContext.createDelay();
+    delay.delayTime.value = 0.3; // Default delay time
+    delay.connect(compressor);
+
+    // Frequency filter setup
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'lowpass'; // Default to lowpass filter
+    filter.frequency.value = 1000;
+    filter.connect(compressor);
+
     const chords = [
         'audio/chord1.mp3',
         'audio/chord2.mp3',
@@ -15,8 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     let audioBuffers = [];
-    let playing = false;
-
     const canvas = document.getElementById('visualizer');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -24,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const circles = []; // Store active circles
 
+    // Load all audio files into buffers
     async function loadAudioFiles() {
         const fetchPromises = chords.map(url => fetch(url).then(res => res.arrayBuffer()));
         const audioData = await Promise.all(fetchPromises);
@@ -33,76 +47,66 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function playFirstNote() {
-        if (audioBuffers.length === 0) await loadAudioFiles();
-        playBuffer(audioBuffers[0]); // Immediately play the first note
-        playRandomChord(); // Start the loop
-    }
-
     function playBuffer(buffer) {
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
-        source.connect(compressor);
+
+        // Randomly reverse the playback
+        if (Math.random() > 0.5) {
+            source.playbackRate.value = -1;
+        }
+
+        // Randomly select and connect FX
+        const fxChoice = Math.random();
+        if (fxChoice < 0.33) {
+            source.connect(filter); // Apply filter
+        } else if (fxChoice < 0.66) {
+            source.connect(delay); // Apply delay
+        } else {
+            source.connect(convolver); // Apply reverb
+        }
+
         source.start();
         createCircle(); // Trigger a new circle with each chord
     }
 
     function playRandomChord() {
-        if (!playing) return;
         const randomIndex = Math.floor(Math.random() * audioBuffers.length);
         playBuffer(audioBuffers[randomIndex]);
+
         const randomInterval = Math.random() * (5000 - 1000) + 1000; // Random time between chords
         setTimeout(playRandomChord, randomInterval);
     }
 
     function startMusic() {
-        if (!playing) {
-            playing = true;
-            playFirstNote(); // Play the first note immediately
+        loadAudioFiles().then(() => {
+            audioContext.resume();
+            playRandomChord();
             animateVisualizer();
-        }
+            evolveFX(); // Continuously evolve FX parameters
+        });
     }
-
-    function stopMusic() {
-        playing = false;
-    }
-
-    document.getElementById('playButton').addEventListener('click', function () {
-        if (playing) {
-            stopMusic();
-            this.textContent = 'Generate'; // Change to "Generate" when stopped
-        } else {
-            if (audioContext.state === 'suspended') {
-                audioContext.resume().then(startMusic);
-            } else {
-                startMusic();
-            }
-            this.textContent = 'Stop'; // Change to "Stop" when playing
-        }
-    });
 
     function createCircle() {
-        const size = Math.random() * 12.5 + 5; // Reduced size (random between 5 and 17.5)
+        const size = Math.random() * 12.5 + 5; // Reduced size (5 to 17.5)
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
-        const opacity = Math.random() * 0.5 + 0.5; // Random opacity between 0.5 and 1
+        const opacity = Math.random() * 0.5 + 0.5; // Random opacity (0.5 to 1)
         const circle = {
             x,
             y,
             size,
             opacity,
-            growth: Math.random() * 1 + 0.5, // Reduced growth speed (between 0.5 and 1.5 per frame)
-            alpha: 1, // Start fully visible
+            growth: Math.random() * 1 + 0.5, // Growth speed (0.5 to 1.5)
+            alpha: 1, // Fully visible
             fadeSpeed: 1 / (60 * 8) // Fade out over 8 seconds
         };
         circles.push(circle);
     }
 
     function animateVisualizer() {
-        if (!playing) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw and update each circle
         for (let i = circles.length - 1; i >= 0; i--) {
             const circle = circles[i];
 
@@ -124,6 +128,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         requestAnimationFrame(animateVisualizer);
     }
+
+    function evolveFX() {
+        // Subtly change FX parameters over time
+        setInterval(() => {
+            filter.frequency.value = Math.random() * 2000 + 500; // Random frequency (500 to 2500 Hz)
+            delay.delayTime.value = Math.random() * 0.5 + 0.1; // Random delay time (0.1 to 0.6s)
+        }, 10000); // Every 10 seconds
+    }
+
+    // Automatically start the music experience
+    startMusic();
 
     // Handle window resize
     window.addEventListener('resize', () => {
